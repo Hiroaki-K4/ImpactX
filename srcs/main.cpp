@@ -4,6 +4,9 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.hpp"
 
@@ -11,9 +14,86 @@
 #include "stb_image.h"
 
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 4.0f, 12.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float deltaTime = 0.0f; // Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+float yaw = -90.0f, pitch = 0.0f;
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
+float fov = 45.0f;
+
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+    float cameraSpeed = 2.5f * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        cameraPos += cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        cameraPos += cameraSpeed * cameraUp;
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        cameraPos -= cameraSpeed * cameraUp;
+    }
+}
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+    if (pitch > 89.0f) {
+        pitch = 89.0f;
+    }
+    if (pitch < -89.0f) {
+        pitch = -89.0f;
+    }
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw) * cos(glm::radians(pitch)));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+}
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    fov -= (float)yoffset;
+    if (fov < 1.0f) {
+        fov = 1.0f;
+    }
+    if (fov > 45.0f) {
+        fov = 45.0f;
     }
 }
 
@@ -77,6 +157,8 @@ int main(int argc, char *argv[]) {
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Error: Failed to initialize GLAD" << std::endl;
@@ -84,19 +166,24 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    Shader shader("../shaders/floor.vs", "../shaders/floor.fs");
+
+    shader.use();
+    shader.setInt("texture1", 0);
+
     // Initialize window
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.4f, 0.7f, 0.9f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     float planeVertices[] = {
-        5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+        10.0f, -0.5f,  10.0f,  2.0f, 0.0f,
+        -10.0f, -0.5f,  10.0f,  0.0f, 0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 2.0f,
 
-        5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-        5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
+        10.0f, -0.5f,  10.0f,  2.0f, 0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 2.0f,
+        10.0f, -0.5f, -10.0f,  2.0f, 2.0f								
     };
 
     // plane VAO;
@@ -123,11 +210,20 @@ int main(int argc, char *argv[]) {
         processInput(window);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        shader.use();
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        glm::mat4 projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+        unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+        unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+
         // floor
-        // TODO: Locate floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floor_texture);
-        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::mat4(1.0f);
+        unsigned int modeLoc = glGetUniformLocation(shader.ID, "model");
         glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
