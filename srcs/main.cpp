@@ -14,7 +14,7 @@
 #include "stb_image.h"
 
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 4.0f, 12.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 12.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -168,13 +168,56 @@ int main(int argc, char *argv[]) {
 
     Shader shader("../shaders/floor.vs", "../shaders/floor.fs");
 
-    shader.use();
-    shader.setInt("texture1", 0);
+    float cubeVertices[] = {
+        // positions          // texture Coords
+        // Front face
+        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
+        0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
+        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
+        -0.25f,  0.25f, -0.25f,  1.0f, 0.0f,
+        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
 
-    // Initialize window
-    glViewport(0, 0, window_w, window_h);
-    glClearColor(0.4f, 0.7f, 0.9f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+        // Back face
+        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
+        0.25f, -0.25f,  0.25f,  0.0f, 1.0f,
+        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
+        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
+        -0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
+
+        // Left face
+        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
+        -0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+        -0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
+        -0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
+        -0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
+
+        // Right face
+        0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
+        0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
+        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
+        0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+        0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
+
+        // Bottom face
+        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
+        0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+        0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+        0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+        -0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
+        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
+
+        // Top face
+        -0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+        0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
+        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
+        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
+        -0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+        -0.25f,  0.25f, -0.25f,  1.0f, 1.0f
+    };
 
     float planeVertices[] = {
         10.0f, -0.5f,  10.0f,  2.0f, 0.0f,
@@ -185,6 +228,26 @@ int main(int argc, char *argv[]) {
         -10.0f, -0.5f, -10.0f,  0.0f, 2.0f,
         10.0f, -0.5f, -10.0f,  2.0f, 2.0f								
     };
+
+    // Initialize window
+    glViewport(0, 0, window_w, window_h);
+    glClearColor(0.4f, 0.7f, 0.9f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // cube VAO
+    unsigned int cubeVAO, cubeVBO;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // Texture coordinate attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glBindVertexArray(0);
 
     // plane VAO;
     unsigned int planeVAO, planeVBO;
@@ -201,29 +264,48 @@ int main(int argc, char *argv[]) {
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
+    glEnable(GL_DEPTH_TEST);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    unsigned int cubeTexture = loadTexture("../textures/awesomeface.png", true);
     unsigned int floor_texture = loadTexture("../textures/floor.png", true);
 
     double last_time = glfwGetTime();
     double fps_last_time = glfwGetTime();
     int frame_num = 0;
+    shader.use();
+    shader.setInt("texture1", 0);
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
-        glClear(GL_COLOR_BUFFER_BIT);
+        // glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        glm::mat4 projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(fov), float(window_w) / float(window_h), 0.1f, 100.0f);
         unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
         unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
+        // cubes
+        glBindVertexArray(cubeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, cubeTexture);
+        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+        unsigned int modeLoc = glGetUniformLocation(shader.ID, "model");
+        glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+        glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         // floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floor_texture);
         model = glm::mat4(1.0f);
-        unsigned int modeLoc = glGetUniformLocation(shader.ID, "model");
+        // unsigned int modeLoc = glGetUniformLocation(shader.ID, "model");
         glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
