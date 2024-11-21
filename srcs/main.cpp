@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.hpp"
+#include "Particle.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -323,9 +324,18 @@ int main(int argc, char *argv[]) {
     };
 
     std::vector<float> particle_vertices = generateParticleVertices(0.3f);
+    int particle_num = 4;
+    Particle particles = Particle(particle_num);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
+
+    // Store instance data in an array buffer
+    unsigned int instanceVBO;
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Cube VAO
     unsigned int cubeVAO, cubeVBO;
@@ -363,6 +373,13 @@ int main(int argc, char *argv[]) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(space_box_vertices), &space_box_vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    // set instance data(position)
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute
 
     glEnable(GL_DEPTH_TEST);
 
@@ -414,6 +431,10 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
         // particle
         particle_shader.use();
         glBindVertexArray(particleVAO);
@@ -425,7 +446,8 @@ int main(int argc, char *argv[]) {
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.0f, 1.5f, -1.0f));
         glUniformMatrix4fv(particle_model, 1, GL_FALSE, &model[0][0]);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, particle_vertices.size());
+        // glDrawArrays(GL_TRIANGLE_FAN, 0, particle_vertices.size());
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, particle_vertices.size(), particle_num);
 
         // Draw skybox as last
         glDepthFunc(GL_LEQUAL);
