@@ -26,6 +26,10 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float fov = 45.0f;
 
+const int LAT_SEGMENTS = 100;
+const int LON_SEGMENTS = 100;
+const float PI = 3.14159265359f;
+
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
@@ -162,6 +166,32 @@ unsigned int loadCubemap(std::vector<std::string> faces) {
     return textureID;
 }
 
+std::vector<float> generateParticleVertices(float radius) {
+    std::vector<float> vertices;
+
+    for (int lat = 0; lat <= LAT_SEGMENTS; ++lat) {
+        int fix_lat = lat - int(LAT_SEGMENTS / 2);
+        float phi = fix_lat * PI / LAT_SEGMENTS;
+        float sinPhi = sin(phi);
+        float cosPhi = cos(phi);
+
+        for (int lon = 0; lon <= LON_SEGMENTS; ++lon) {
+            float theta = lon * 2 * PI / LON_SEGMENTS;
+            float sinTheta = sin(theta);
+            float cosTheta = cos(theta);
+
+            float x = radius * cosPhi * cosTheta;
+            float y = radius * sinPhi;
+            float z = radius * cosPhi * sinTheta;
+
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+        }
+    }
+    return vertices;
+}
+
 int main(int argc, char *argv[]) {
     // Initialize window
     if (!glfwInit()) {
@@ -193,6 +223,7 @@ int main(int argc, char *argv[]) {
     }
 
     Shader shader("../shaders/floor.vs", "../shaders/floor.fs");
+    Shader particle_shader("../shaders/particle.vs", "../shaders/particle.fs");
     Shader space_box_shader("../shaders/space_box.vs", "../shaders/space_box.fs");
 
     float cubeVertices[] = {
@@ -291,10 +322,12 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
+    std::vector<float> particle_vertices = generateParticleVertices(0.3f);
+
     // Initialize window
     glViewport(0, 0, window_w, window_h);
 
-    // cube VAO
+    // Cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &cubeVBO);
@@ -307,6 +340,18 @@ int main(int argc, char *argv[]) {
     // Texture coordinate attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glBindVertexArray(0);
+
+    // particle VAO
+    unsigned int particleVAO, particleVBO;
+    glGenVertexArrays(1, &particleVAO);
+    glGenBuffers(1, &particleVBO);
+    glBindVertexArray(particleVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, particleVBO);
+    glBufferData(GL_ARRAY_BUFFER, particle_vertices.size() * sizeof(float), particle_vertices.data(), GL_STATIC_DRAW);
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
     glBindVertexArray(0);
 
     // Space box VAO
@@ -356,7 +401,7 @@ int main(int argc, char *argv[]) {
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
-        // cubes
+        // Cube
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
@@ -368,6 +413,19 @@ int main(int argc, char *argv[]) {
         model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
         glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // particle
+        particle_shader.use();
+        glBindVertexArray(particleVAO);
+        unsigned int particle_view = glGetUniformLocation(particle_shader.ID, "view");
+        unsigned int particle_proj = glGetUniformLocation(particle_shader.ID, "projection");
+        glUniformMatrix4fv(particle_view, 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(particle_proj, 1, GL_FALSE, &projection[0][0]);
+        unsigned int particle_model = glGetUniformLocation(particle_shader.ID, "model");
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0f, 1.5f, -1.0f));
+        glUniformMatrix4fv(particle_model, 1, GL_FALSE, &model[0][0]);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, particle_vertices.size());
 
         // Draw skybox as last
         glDepthFunc(GL_LEQUAL);
