@@ -223,60 +223,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    Shader shader("../shaders/floor.vs", "../shaders/floor.fs");
     Shader particle_shader("../shaders/particle.vs", "../shaders/particle.fs");
     Shader space_box_shader("../shaders/space_box.vs", "../shaders/space_box.fs");
-
-    float cubeVertices[] = {
-        // positions          // texture Coords
-        // Front face
-        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
-        0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
-        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
-        -0.25f,  0.25f, -0.25f,  1.0f, 0.0f,
-        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
-
-        // Back face
-        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
-        0.25f, -0.25f,  0.25f,  0.0f, 1.0f,
-        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
-        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
-        -0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
-
-        // Left face
-        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
-        -0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-        -0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
-        -0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
-        -0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-        -0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
-
-        // Right face
-        0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
-        0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
-        0.25f,  0.25f, -0.25f,  0.0f, 0.0f,
-        0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-        0.25f, -0.25f,  0.25f,  1.0f, 1.0f,
-
-        // Bottom face
-        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
-        0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-        0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-        0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-        -0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
-        -0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
-
-        // Top face
-        -0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-        0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
-        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
-        0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
-        -0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-        -0.25f,  0.25f, -0.25f,  1.0f, 1.0f
-    };
 
     float space_box_vertices[] = {
         // positions          
@@ -330,6 +278,11 @@ int main(int argc, char *argv[]) {
     // Initialize window
     glViewport(0, 0, window_w, window_h);
 
+    // particle VAO
+    unsigned int particleVAO, particleVBO;
+    glGenVertexArrays(1, &particleVAO);
+    glGenBuffers(1, &particleVBO);
+
     // Store instance data in an array buffer
     unsigned int instanceVBO;
     glGenBuffers(1, &instanceVBO);
@@ -337,31 +290,18 @@ int main(int argc, char *argv[]) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // Cube VAO
-    unsigned int cubeVAO, cubeVBO;
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &cubeVBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // Texture coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glBindVertexArray(0);
-
-    // particle VAO
-    unsigned int particleVAO, particleVBO;
-    glGenVertexArrays(1, &particleVAO);
-    glGenBuffers(1, &particleVBO);
     glBindVertexArray(particleVAO);
     glBindBuffer(GL_ARRAY_BUFFER, particleVBO);
     glBufferData(GL_ARRAY_BUFFER, particle_vertices.size() * sizeof(float), particle_vertices.data(), GL_STATIC_DRAW);
-    // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // Particle instance data
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(1, 1); // Tell OpenGL this is per-instance data
     glBindVertexArray(0);
 
     // Space box VAO
@@ -373,13 +313,7 @@ int main(int argc, char *argv[]) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(space_box_vertices), &space_box_vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-    // set instance data(position)
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute
+    glBindVertexArray(0);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -399,37 +333,12 @@ int main(int argc, char *argv[]) {
     double last_time = glfwGetTime();
     double fps_last_time = glfwGetTime();
     int frame_num = 0;
-    shader.use();
-    shader.setInt("texture1", 0);
     space_box_shader.use();
     space_box_shader.setInt("spacebox", 0);
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
-        // glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.use();
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        glm::mat4 projection = glm::perspective(glm::radians(fov), float(window_w) / float(window_h), 0.1f, 100.0f);
-        unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
-        unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
-
-        // Cube
-        glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cubeTexture);
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-        unsigned int modeLoc = glGetUniformLocation(shader.ID, "model");
-        glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-        glUniformMatrix4fv(modeLoc, 1, GL_FALSE, &model[0][0]);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
@@ -437,24 +346,21 @@ int main(int argc, char *argv[]) {
 
         // particle
         particle_shader.use();
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        glm::mat4 projection = glm::perspective(glm::radians(fov), float(window_w) / float(window_h), 0.1f, 100.0f);
         glBindVertexArray(particleVAO);
         unsigned int particle_view = glGetUniformLocation(particle_shader.ID, "view");
         unsigned int particle_proj = glGetUniformLocation(particle_shader.ID, "projection");
         glUniformMatrix4fv(particle_view, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(particle_proj, 1, GL_FALSE, &projection[0][0]);
-        unsigned int particle_model = glGetUniformLocation(particle_shader.ID, "model");
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, 1.5f, -1.0f));
-        glUniformMatrix4fv(particle_model, 1, GL_FALSE, &model[0][0]);
-        // glDrawArrays(GL_TRIANGLE_FAN, 0, particle_vertices.size());
         glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, particle_vertices.size(), particle_num);
 
         // Draw skybox as last
         glDepthFunc(GL_LEQUAL);
         space_box_shader.use();
         view = glm::mat3(glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp)); // Remove translation from the view matrix
-        viewLoc = glGetUniformLocation(space_box_shader.ID, "view");
-        projLoc = glGetUniformLocation(space_box_shader.ID, "projection");
+        unsigned int viewLoc = glGetUniformLocation(space_box_shader.ID, "view");
+        unsigned int projLoc = glGetUniformLocation(space_box_shader.ID, "projection");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
         // Skybox cube
