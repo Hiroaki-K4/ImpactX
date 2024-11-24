@@ -27,8 +27,8 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float fov = 45.0f;
 
-const int LAT_SEGMENTS = 100;
-const int LON_SEGMENTS = 100;
+const int LAT_SEGMENTS = 5;
+const int LON_SEGMENTS = 10;
 const float PI = 3.14159265359f;
 
 void processInput(GLFWwindow* window) {
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
 
     int window_w = 1920;
     int window_h = 1080;
-    std::string window_title = "NewtonX";
+    std::string window_title = "ImpactX";
     GLFWwindow* window = glfwCreateWindow(window_w, window_h, window_title.c_str(), NULL, NULL);
     if (window == NULL) {
         std::cout << "Error: Failed to create GLFW window" << std::endl;
@@ -271,9 +271,11 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
-    std::vector<float> particle_vertices = generateParticleVertices(0.3f);
-    int particle_num = 4;
-    Particle particles = Particle(particle_num);
+    std::vector<float> particle_vertices = generateParticleVertices(0.005f);
+    glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
+    float planet_radius = 2.0f;
+    int particle_num = 1000000;
+    Particle particles = Particle(center_pos, planet_radius, particle_num);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
@@ -353,7 +355,7 @@ int main(int argc, char *argv[]) {
         unsigned int particle_proj = glGetUniformLocation(particle_shader.ID, "projection");
         glUniformMatrix4fv(particle_view, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(particle_proj, 1, GL_FALSE, &projection[0][0]);
-        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, particle_vertices.size(), particle_num);
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, particle_vertices.size() / 3, particle_num);
 
         // Draw skybox as last
         glDepthFunc(GL_LEQUAL);

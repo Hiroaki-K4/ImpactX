@@ -1,7 +1,7 @@
 #include "Particle.hpp"
 
-Particle::Particle(int particle_num) {
-    initialize_position(particle_num);
+Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num) {
+    initialize_position(center_pos, planet_radius, particle_num);
 }
 
 Particle::~Particle() {
@@ -12,9 +12,25 @@ std::vector<glm::vec3> Particle::get_particle_position() {
     return this->position;
 }
 
-void Particle::initialize_position(int particle_num) {
-    this->position.push_back(glm::vec3(-10.0f, 1.5f, -1.0f));
-    this->position.push_back(glm::vec3(1.0f, 1.5f, -10.0f));
-    this->position.push_back(glm::vec3(-15.0f, -1.5f, -1.0f));
-    this->position.push_back(glm::vec3(1.0f, -1.5f, -15.0f));
+void Particle::initialize_position(
+    glm::vec3 center_pos, float planet_radius, int particle_num) {
+    std::random_device rd;   // Seed for the random number engine
+    std::mt19937 gen(rd());  // Mersenne Twister engine
+
+    // Define a distribution between -1 and 1
+    std::uniform_real_distribution<float> angle_phi_dis(-M_PI / 2.0f, M_PI / 2.0f);
+    std::uniform_real_distribution<float> angle_theta_dis(0.0f, 2.0f * M_PI);
+    std::uniform_real_distribution<float> radius_dis(0.0f, planet_radius);
+    for (int i = 0; i < particle_num; i++) {
+        glm::vec3 pos;
+        float angle_phi = angle_phi_dis(gen);
+        float angle_theta = angle_theta_dis(gen);
+        float radius = radius_dis(gen);
+
+        pos.x = radius * cos(angle_phi) * cos(angle_theta);
+        pos.y = radius * sin(angle_phi);
+        pos.z = radius * cos(angle_phi) * sin(angle_theta);
+        this->position.push_back(pos);
+        // std::cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+    }
 }
