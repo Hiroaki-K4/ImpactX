@@ -1,7 +1,10 @@
 #include "Particle.hpp"
 
-Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num) {
+Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity) {
     initialize_position(center_pos, planet_radius, particle_num);
+    for (int i = 0; i < particle_num; i++) {
+        this->velocity.push_back(velocity);
+    }
 }
 
 Particle::~Particle() {
@@ -32,5 +35,15 @@ void Particle::initialize_position(
         pos.z = radius * cos(angle_phi) * sin(angle_theta);
         this->position.push_back(pos);
         // std::cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
+    }
+}
+
+void Particle::update_position(float delta_time) {
+    for (int i = 0; i < this->position.size(); i++) {
+        for (int j = 0; j < this->position.size(); j++) {
+            continue;
+        }
+        this->position[i] += this->velocity[i] * delta_time;
+
     }
 }

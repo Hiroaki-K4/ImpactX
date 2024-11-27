@@ -15,7 +15,7 @@
 #include "stb_image.h"
 
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 12.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 30.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -274,8 +274,9 @@ int main(int argc, char *argv[]) {
     std::vector<float> particle_vertices = generateParticleVertices(0.005f);
     glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
     float planet_radius = 2.0f;
-    int particle_num = 1000000;
-    Particle particles = Particle(center_pos, planet_radius, particle_num);
+    int particle_num = 10000;
+    glm::vec3 velocity = glm::vec3(1.0f);
+    Particle particles = Particle(center_pos, planet_radius, particle_num, velocity);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
@@ -341,6 +342,11 @@ int main(int argc, char *argv[]) {
         processInput(window);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        double current_time = glfwGetTime();
+        double delta = current_time - last_time;
+        particles.update_position(delta);
+        last_time = glfwGetTime();
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
