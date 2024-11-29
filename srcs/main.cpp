@@ -274,7 +274,7 @@ int main(int argc, char *argv[]) {
     std::vector<float> particle_vertices = generateParticleVertices(0.005f);
     glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
     float planet_radius = 2.0f;
-    int particle_num = 10000;
+    int particle_num = 1000000;
     glm::vec3 velocity = glm::vec3(1.0f);
     Particle particles = Particle(center_pos, planet_radius, particle_num, velocity);
 

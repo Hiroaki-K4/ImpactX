@@ -1,5 +1,6 @@
 #include "Particle.hpp"
 
+
 Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity) {
     reset_min_max_position();
     initialize_position(center_pos, planet_radius, particle_num);
@@ -8,9 +9,7 @@ Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num, 
     }
 }
 
-Particle::~Particle() {
-
-}
+Particle::~Particle() {}
 
 std::vector<glm::vec3> Particle::get_particle_position() {
     return this->position;
@@ -41,8 +40,13 @@ void Particle::initialize_position(
 
 void Particle::update_position(float delta_time) {
     reset_min_max_position();
+
+    Octree octree;
+
     for (int i = 0; i < this->position.size(); i++) {
-        for (int j = 0; j < this->position.size(); j++) {
+        int j_max = log(this->position.size());
+        for (int j = 0; j < j_max; j++) {
+        // for (int j = 0; j < this->position.size(); j++) {
             continue;
         }
         this->position[i] += this->velocity[i] * delta_time;

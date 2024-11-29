@@ -9,6 +9,8 @@
 #include <iostream>
 #include <limits>
 
+#include "Octree.hpp"
+
 
 class Particle {
     private:
