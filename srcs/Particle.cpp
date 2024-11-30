@@ -41,7 +41,7 @@ void Particle::initialize_position(
 void Particle::update_position(float delta_time) {
     reset_min_max_position();
 
-    Octree octree;
+    Octree octree(this->min_3d_coord, this->max_3d_coord);
 
     for (int i = 0; i < this->position.size(); i++) {
         int j_max = log(this->position.size());
