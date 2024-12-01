@@ -21,12 +21,12 @@ class Particle {
         glm::vec3 min_3d_coord;
 
     public:
-        Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity);
+        Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity, float mass);
         ~Particle();
 
         std::vector<glm::vec3> get_particle_position();
 
-        void initialize_position(glm::vec3 center_pos, float planet_radius, int particle_num);
+        void initialize_position(glm::vec3 center_pos, float planet_radius, int particle_num, float mass);
         void update_position(float delta_time);
         void update_min_max_position(glm::vec3 pos);
         void reset_min_max_position();

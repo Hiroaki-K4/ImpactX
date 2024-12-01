@@ -5,21 +5,51 @@ Octree::Octree(glm::vec3 min_3d_coord, glm::vec3 max_3d_coord) {
     this->root.min_bound = min_3d_coord;
     this->root.max_bound = max_3d_coord;
     this->root.is_leaf = false;
+    this->root.is_empty = false;
     subdivide(this->root);
-    std::cout << "child " << this->root.children.size() << std::endl;
 }
 
 Octree::~Octree() {}
 
-void Octree::insert(std::vector<glm::vec3> position, std::vector<float> mass) {
+bool Octree::is_point_inside(Node &node, glm::vec3 position) {
+    if (position.x < node.min_bound.x || position.x > node.max_bound.x ||
+        position.y < node.min_bound.y || position.y > node.max_bound.y ||
+        position.z < node.min_bound.z || position.z > node.max_bound.z) {
+        return false;
+    }
+    return true;
+}
+
+void Octree::insert(std::vector<glm::vec3> &position, std::vector<float> &mass) {
     for (int i = 0; i < position.size(); i++) {
-        // insert_point(this->root, position, mass);
+        // TODO: Fix insert function because it is too slow.
+        if (i % 1000 == 0) {
+            std::cout << "i: " << i << std::endl;
+        }
+        insert_point(this->root, position[i], mass[i]);
     }
 }
 
-// TODO: Add insert function
-void Octree::insert_point(Node node, std::vector<glm::vec3> position, std::vector<float> mass) {
-    
+void Octree::insert_point(Node &node, glm::vec3 position, float mass) {
+    if (!is_point_inside(node, position)) {
+        return;
+    }
+
+    // is_empty -> add point
+    // is_leaf -> subdivide
+    // !is_empty -> go down tree
+    if (node.is_empty) {
+        node.position = position;
+        node.mass = mass;
+        node.is_empty = false;
+    } else {
+        if (node.is_leaf) {
+            subdivide(node);
+        }
+        for (auto& child : node.children) {
+            insert_point(child, position, mass);
+        }
+    }
 }
 
 void Octree::subdivide(Node &node) {
@@ -76,7 +106,6 @@ void Octree::subdivide(Node &node) {
             glm::vec3(node.max_bound.x, node.max_bound.y, node.max_bound.z)
         )
     );
-    std::cout << "node " << node.children.size() << std::endl;
 }
 
 Node Octree::create_child_node(glm::vec3 min_bound, glm::vec3 max_bound) {

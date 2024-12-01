@@ -276,7 +276,8 @@ int main(int argc, char *argv[]) {
     float planet_radius = 2.0f;
     int particle_num = 1000000;
     glm::vec3 velocity = glm::vec3(1.0f);
-    Particle particles = Particle(center_pos, planet_radius, particle_num, velocity);
+    float mass = 0.01f;
+    Particle particles = Particle(center_pos, planet_radius, particle_num, velocity, mass);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);

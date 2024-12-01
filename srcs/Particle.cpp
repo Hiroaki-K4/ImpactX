@@ -1,9 +1,9 @@
 #include "Particle.hpp"
 
 
-Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity) {
+Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity, float mass) {
     reset_min_max_position();
-    initialize_position(center_pos, planet_radius, particle_num);
+    initialize_position(center_pos, planet_radius, particle_num, mass);
     for (int i = 0; i < particle_num; i++) {
         this->velocity.push_back(velocity);
     }
@@ -16,7 +16,7 @@ std::vector<glm::vec3> Particle::get_particle_position() {
 }
 
 void Particle::initialize_position(
-    glm::vec3 center_pos, float planet_radius, int particle_num) {
+    glm::vec3 center_pos, float planet_radius, int particle_num, float mass) {
     std::random_device rd;   // Seed for the random number engine
     std::mt19937 gen(rd());  // Mersenne Twister engine
 
@@ -34,14 +34,15 @@ void Particle::initialize_position(
         pos.y = radius * sin(angle_phi);
         pos.z = radius * cos(angle_phi) * sin(angle_theta);
         this->position.push_back(pos);
+        this->mass.push_back(mass);
         update_min_max_position(pos);
     }
 }
 
 void Particle::update_position(float delta_time) {
-    reset_min_max_position();
-
     Octree octree(this->min_3d_coord, this->max_3d_coord);
+    octree.insert(this->position, this->mass);
+    reset_min_max_position();
 
     for (int i = 0; i < this->position.size(); i++) {
         int j_max = log(this->position.size());
@@ -52,8 +53,6 @@ void Particle::update_position(float delta_time) {
         this->position[i] += this->velocity[i] * delta_time;
         update_min_max_position(this->position[i]);
     }
-    // std::cout << "max: " << this->max_3d_coord.x << " " << this->max_3d_coord.y << " " << this->max_3d_coord.z << std::endl;
-    // std::cout << "min: " << this->min_3d_coord.x << " " << this->min_3d_coord.y << " " << this->min_3d_coord.z << std::endl;
 }
 
 void Particle::update_min_max_position(glm::vec3 pos) {

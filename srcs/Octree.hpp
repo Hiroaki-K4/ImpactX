@@ -16,6 +16,7 @@ struct Node {
     glm::vec3 max_bound;
     std::vector<Node> children;
     bool is_leaf = true;
+    bool is_empty = true;
     Node *prev_node;
 };
 
@@ -28,8 +29,9 @@ class Octree {
         Octree(glm::vec3 min_3d_coord, glm::vec3 max_3d_coord);
         ~Octree();
 
-        void insert(std::vector<glm::vec3> position, std::vector<float> mass);
-        void insert_point(Node node, std::vector<glm::vec3> position, std::vector<float> mass);
+        bool is_point_inside(Node &node, glm::vec3 position);
+        void insert(std::vector<glm::vec3> &position, std::vector<float> &mass);
+        void insert_point(Node &node, glm::vec3 position, float mass);
         void subdivide(Node &node);
         Node create_child_node(glm::vec3 min_bound, glm::vec3 max_bound);
 };
