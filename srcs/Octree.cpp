@@ -26,38 +26,6 @@ void Octree::insert(std::vector<glm::vec3> &position, std::vector<float> &mass) 
     }
 }
 
-// void Octree::insert_point(Node &node, const glm::vec3 &position, float mass) {
-//     if (!is_point_inside(node, position)) {
-//         return;
-//     }
-
-//     // is_empty -> add point
-//     // is_leaf -> subdivide
-//     // !is_empty -> go down tree
-//     if (node.is_empty) {
-//         node.position = position;
-//         node.mass = mass;
-//         node.is_empty = false;
-//     } else {
-//         if (node.is_leaf) {
-//             subdivide(node);
-//             for (auto& child : node.children) {
-//                 if (is_point_inside(child, node.position)) {
-//                     insert_point(child, node.position, node.mass);
-//                     break;
-//                 }
-//             }
-//             node.is_leaf = false;
-//         }
-//         for (auto& child : node.children) {
-//             if (is_point_inside(child, position)) {
-//                 insert_point(child, position, mass);
-//                 break;
-//             }
-//         }
-//     }
-// }
-
 void Octree::insert_point(Node &node, const glm::vec3 &position, float mass) {
     if (!is_point_inside(node, position)) {
         return;
@@ -67,6 +35,9 @@ void Octree::insert_point(Node &node, const glm::vec3 &position, float mass) {
         if (node.positions.size() < this->max_points) {
             node.positions.push_back(position);
             node.multi_mass.push_back(mass);
+            node.center_of_mass = (
+                node.center_of_mass * node.total_mass + position * mass) / (node.total_mass + mass);
+            node.total_mass += mass;
         } else {
             subdivide(node);
             for (int i = 0; i < node.positions.size(); i++) {
@@ -81,6 +52,9 @@ void Octree::insert_point(Node &node, const glm::vec3 &position, float mass) {
             node.is_leaf = false;
         }
     } else {
+        node.center_of_mass = (
+            node.center_of_mass * node.total_mass + position * mass) / (node.total_mass + mass);
+        node.total_mass += mass;
         for (auto& child : node.children) {
             if (is_point_inside(child, position)) {
                 insert_point(child, position, mass);
@@ -148,7 +122,8 @@ void Octree::subdivide(Node &node) {
     node.children.push_back(new_node);
 }
 
-void Octree::create_child_node(Node &new_node, const glm::vec3 &min_bound, const glm::vec3 &max_bound) {
+void Octree::create_child_node(
+    Node &new_node, const glm::vec3 &min_bound, const glm::vec3 &max_bound) {
     new_node.min_bound = min_bound;
     new_node.max_bound = max_bound;
 }

@@ -15,9 +15,10 @@ struct Node {
     glm::vec3 min_bound;
     glm::vec3 max_bound;
     std::vector<Node> children;
+    glm::vec3 center_of_mass;
+    float total_mass = 0;
     bool is_leaf = true;
     bool is_empty = true;
-    Node *prev_node;
 };
 
 
