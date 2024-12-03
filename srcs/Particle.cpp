@@ -1,4 +1,6 @@
 #include "Particle.hpp"
+#include <chrono>
+using namespace std::chrono;
 
 
 Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity, float mass) {
@@ -41,11 +43,16 @@ void Particle::initialize_position(
 
 void Particle::update_position(float delta_time) {
     Octree octree(this->min_3d_coord, this->max_3d_coord);
+    // auto start = high_resolution_clock::now();
     octree.insert(this->position, this->mass);
+    // auto stop = high_resolution_clock::now();
+    // std::chrono::duration<double> elapsed_seconds = stop - start;
+    // std::cout << elapsed_seconds.count() << std::endl;
     reset_min_max_position();
 
     for (int i = 0; i < this->position.size(); i++) {
         int j_max = log(this->position.size());
+        // int j_max = this->position.size();
         for (int j = 0; j < j_max; j++) {
         // for (int j = 0; j < this->position.size(); j++) {
             continue;

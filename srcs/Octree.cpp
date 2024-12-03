@@ -26,30 +26,61 @@ void Octree::insert(std::vector<glm::vec3> &position, std::vector<float> &mass) 
     }
 }
 
+// void Octree::insert_point(Node &node, const glm::vec3 &position, float mass) {
+//     if (!is_point_inside(node, position)) {
+//         return;
+//     }
+
+//     // is_empty -> add point
+//     // is_leaf -> subdivide
+//     // !is_empty -> go down tree
+//     if (node.is_empty) {
+//         node.position = position;
+//         node.mass = mass;
+//         node.is_empty = false;
+//     } else {
+//         if (node.is_leaf) {
+//             subdivide(node);
+//             for (auto& child : node.children) {
+//                 if (is_point_inside(child, node.position)) {
+//                     insert_point(child, node.position, node.mass);
+//                     break;
+//                 }
+//             }
+//             node.is_leaf = false;
+//         }
+//         for (auto& child : node.children) {
+//             if (is_point_inside(child, position)) {
+//                 insert_point(child, position, mass);
+//                 break;
+//             }
+//         }
+//     }
+// }
+
 void Octree::insert_point(Node &node, const glm::vec3 &position, float mass) {
     if (!is_point_inside(node, position)) {
         return;
     }
 
-    // is_empty -> add point
-    // is_leaf -> subdivide
-    // !is_empty -> go down tree
-    if (node.is_empty) {
-        node.position = position;
-        node.mass = mass;
-        node.is_empty = false;
-    } else {
-        if (node.is_leaf) {
-            // TODO: Set max points threshold
+    if (node.is_leaf) {
+        if (node.positions.size() < this->max_points) {
+            node.positions.push_back(position);
+            node.multi_mass.push_back(mass);
+        } else {
             subdivide(node);
-            for (auto& child : node.children) {
-                if (is_point_inside(child, node.position)) {
-                    insert_point(child, node.position, node.mass);
-                    break;
+            for (int i = 0; i < node.positions.size(); i++) {
+                for (auto& child : node.children) {
+                    if (is_point_inside(child, node.positions[i])) {
+                        insert_point(child, node.positions[i], node.multi_mass[i]);
+                        break;
+                    }
                 }
             }
+            node.positions.clear();
             node.is_leaf = false;
         }
+    } else {
         for (auto& child : node.children) {
             if (is_point_inside(child, position)) {
                 insert_point(child, position, mass);

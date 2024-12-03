@@ -27,8 +27,8 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float fov = 45.0f;
 
-const int LAT_SEGMENTS = 5;
-const int LON_SEGMENTS = 10;
+const int LAT_SEGMENTS = 10;
+const int LON_SEGMENTS = 20;
 const float PI = 3.14159265359f;
 
 void processInput(GLFWwindow* window) {
@@ -271,10 +271,10 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
-    std::vector<float> particle_vertices = generateParticleVertices(0.005f);
+    std::vector<float> particle_vertices = generateParticleVertices(0.03f);
     glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
     float planet_radius = 2.0f;
-    int particle_num = 1000000;
+    int particle_num = 100000;
     glm::vec3 velocity = glm::vec3(1.0f);
     float mass = 0.01f;
     Particle particles = Particle(center_pos, planet_radius, particle_num, velocity, mass);
