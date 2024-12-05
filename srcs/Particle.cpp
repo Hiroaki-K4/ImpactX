@@ -3,7 +3,9 @@
 using namespace std::chrono;
 
 
-Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity, float mass) {
+Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num,
+    glm::vec3 velocity, float mass, float particle_radius) {
+    this->collision_distance = particle_radius * 2;
     reset_min_max_position();
     initialize_position(center_pos, planet_radius, particle_num, mass);
     for (int i = 0; i < particle_num; i++) {
@@ -42,23 +44,28 @@ void Particle::initialize_position(
 }
 
 void Particle::update_position(float delta_time) {
-    Octree octree(this->min_3d_coord, this->max_3d_coord);
-    // auto start = high_resolution_clock::now();
-    octree.insert(this->position, this->mass);
-    // auto stop = high_resolution_clock::now();
-    // std::chrono::duration<double> elapsed_seconds = stop - start;
-    // std::cout << elapsed_seconds.count() << std::endl;
-    reset_min_max_position();
+    // Octree octree(this->min_3d_coord, this->max_3d_coord);
+    // octree.insert(this->position, this->mass);
 
+    glm::vec3 accel;
+    float accel_power;
     for (int i = 0; i < this->position.size(); i++) {
-        int j_max = log(this->position.size());
-        // int j_max = this->position.size();
-        for (int j = 0; j < j_max; j++) {
-        // for (int j = 0; j < this->position.size(); j++) {
-            continue;
+        for (int j = 0; j < this->position.size(); j++) {
+            float dist = glm::distance(this->position[i], this->position[j]);
+            if (dist <= this->collision_distance) {
+                // Calculate collision
+                accel = glm::vec3(0.0f);
+                // TODO: Implement collision
+            } else {
+                // Calculate gravity
+                float accel_power = this->mass[i] * this->mass[j] / std::pow(dist, 2);
+                accel = (this->position[j] - this->position[i]) / dist;
+                accel *= accel_power;
+            }
+            this->velocity[i] += accel * delta_time;
         }
         this->position[i] += this->velocity[i] * delta_time;
-        update_min_max_position(this->position[i]);
+        // update_min_max_position(this->position[i]);
     }
 }
 

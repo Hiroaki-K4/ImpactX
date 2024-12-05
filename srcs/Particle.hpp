@@ -8,6 +8,7 @@
 #include <random>
 #include <iostream>
 #include <limits>
+#include <cmath>
 
 #include "Octree.hpp"
 
@@ -19,9 +20,12 @@ class Particle {
         std::vector<float> mass;
         glm::vec3 max_3d_coord;
         glm::vec3 min_3d_coord;
+        float collision_distance;
+        const float g_const = 1.0f;
 
     public:
-        Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity, float mass);
+        Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity,
+            float mass, float particle_radius);
         ~Particle();
 
         std::vector<glm::vec3> get_particle_position();
