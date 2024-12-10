@@ -1,6 +1,4 @@
 #include "Particle.hpp"
-#include <chrono>
-using namespace std::chrono;
 
 
 Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num,
@@ -28,7 +26,8 @@ void Particle::initialize_position(
     std::uniform_real_distribution<float> angle_phi_dis(-M_PI / 2.0f, M_PI / 2.0f);
     std::uniform_real_distribution<float> angle_theta_dis(0.0f, 2.0f * M_PI);
     std::uniform_real_distribution<float> radius_dis(0.0f, planet_radius);
-    for (int i = 0; i < particle_num; i++) {
+    int i = 0;
+    while (i < particle_num) {
         glm::vec3 pos;
         float angle_phi = angle_phi_dis(gen);
         float angle_theta = angle_theta_dis(gen);
@@ -37,9 +36,22 @@ void Particle::initialize_position(
         pos.x = radius * cos(angle_phi) * cos(angle_theta);
         pos.y = radius * sin(angle_phi);
         pos.z = radius * cos(angle_phi) * sin(angle_theta);
-        this->position.push_back(pos);
-        this->mass.push_back(mass);
-        update_min_max_position(pos);
+
+        bool is_distance_valid = true;
+        for (int j = 0; j < this->position.size(); j++) {
+            float dist = glm::distance(pos, this->position[j]);
+            if (dist <= this->collision_distance) {
+                is_distance_valid = false;
+                break;
+            }
+        }
+
+        if (is_distance_valid) {
+            this->position.push_back(pos);
+            this->mass.push_back(mass);
+            update_min_max_position(pos);
+            i++;
+        }
     }
 }
 
@@ -51,18 +63,22 @@ void Particle::update_position(float delta_time) {
     float accel_power;
     for (int i = 0; i < this->position.size(); i++) {
         for (int j = 0; j < this->position.size(); j++) {
+            if (i == j) {
+                continue;
+            }
             float dist = glm::distance(this->position[i], this->position[j]);
             if (dist <= this->collision_distance) {
                 // Calculate collision
-                accel = glm::vec3(0.0f);
-                // TODO: Implement collision
+                glm::vec3 new_velocity_vec = this->position[i] - this->position[j];
+                this->velocity[i] = (this->mass[i] - this->mass[j]) / (this->mass[i] + this->mass[j]) * this->velocity[i] +
+                                    2 * this->mass[j] / (this->mass[i] + this->mass[j]) * this->velocity[j];
             } else {
                 // Calculate gravity
                 float accel_power = this->mass[i] * this->mass[j] / std::pow(dist, 2);
                 accel = (this->position[j] - this->position[i]) / dist;
                 accel *= accel_power;
+                this->velocity[i] += accel * delta_time;
             }
-            this->velocity[i] += accel * delta_time;
         }
         this->position[i] += this->velocity[i] * delta_time;
         // update_min_max_position(this->position[i]);
