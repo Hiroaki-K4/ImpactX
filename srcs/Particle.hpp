@@ -9,6 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <cmath>
+#include <cuda_runtime.h>
 
 #include "Octree.hpp"
 
@@ -18,10 +19,9 @@ class Particle {
         std::vector<glm::vec3> position;
         std::vector<glm::vec3> velocity;
         std::vector<float> mass;
-        glm::vec3 max_3d_coord;
-        glm::vec3 min_3d_coord;
+        // glm::vec3 max_3d_coord;
+        // glm::vec3 min_3d_coord;
         float collision_distance;
-        const float g_const = 1.0f;
 
     public:
         Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity,
@@ -31,9 +31,9 @@ class Particle {
         std::vector<glm::vec3> get_particle_position();
 
         void initialize_position(glm::vec3 center_pos, float planet_radius, int particle_num, float mass);
-        void update_position(float delta_time);
-        void update_min_max_position(glm::vec3 pos);
-        void reset_min_max_position();
+        void update_particle(float delta_time);
+        // void update_min_max_position(glm::vec3 pos);
+        // void reset_min_max_position();
 };
 
 #endif
