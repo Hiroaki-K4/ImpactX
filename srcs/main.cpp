@@ -15,7 +15,7 @@
 #include "stb_image.h"
 
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 12.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 30.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -27,8 +27,8 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 float fov = 45.0f;
 
-const int LAT_SEGMENTS = 100;
-const int LON_SEGMENTS = 100;
+const int LAT_SEGMENTS = 10;
+const int LON_SEGMENTS = 20;
 const float PI = 3.14159265359f;
 
 void processInput(GLFWwindow* window) {
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
 
     int window_w = 1920;
     int window_h = 1080;
-    std::string window_title = "NewtonX";
+    std::string window_title = "ImpactX";
     GLFWwindow* window = glfwCreateWindow(window_w, window_h, window_title.c_str(), NULL, NULL);
     if (window == NULL) {
         std::cout << "Error: Failed to create GLFW window" << std::endl;
@@ -271,9 +271,14 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
-    std::vector<float> particle_vertices = generateParticleVertices(0.3f);
-    int particle_num = 4;
-    Particle particles = Particle(particle_num);
+    float particle_radius = 0.03f;
+    std::vector<float> particle_vertices = generateParticleVertices(particle_radius);
+    glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
+    float planet_radius = 2.0f;
+    int particle_num = 2000;
+    glm::vec3 velocity = glm::vec3(0.5f);
+    float mass = 0.01f;
+    Particle particles = Particle(center_pos, planet_radius, particle_num, velocity, mass, particle_radius);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
@@ -340,6 +345,11 @@ int main(int argc, char *argv[]) {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        double current_time = glfwGetTime();
+        double delta = current_time - last_time;
+        particles.update_position(delta);
+        last_time = glfwGetTime();
+
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -353,7 +363,7 @@ int main(int argc, char *argv[]) {
         unsigned int particle_proj = glGetUniformLocation(particle_shader.ID, "projection");
         glUniformMatrix4fv(particle_view, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(particle_proj, 1, GL_FALSE, &projection[0][0]);
-        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, particle_vertices.size(), particle_num);
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, particle_vertices.size() / 3, particle_num);
 
         // Draw skybox as last
         glDepthFunc(GL_LEQUAL);
