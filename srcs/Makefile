@@ -1,5 +1,5 @@
 PARENT_DIR := /home/h-kubo/mypro/
-SRCS := main.cpp Shader.cpp Particle.cpp Octree.cpp kernel.cu glad.c
+SRCS := main.cpp Particle.cpp Shader.cpp Octree.cpp ParticleCuda.cu kernel.cu glad.c
 INCLUDE := -I../glfw/include -I../glad/include -I../glm
 LDFLAGS := -L$(PARENT_DIR)ImpactX/glfw/build/src `pkg-config --libs glfw3` -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 NAME := ImpactX

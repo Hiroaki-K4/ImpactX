@@ -8,8 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.hpp"
 #include "Particle.hpp"
+#include "Shader.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -282,7 +282,7 @@ int main(int argc, char *argv[]) {
     glm::vec3 velocity = glm::vec3(0.5f);
     float mass = 0.01f;
     std::cout << "Hi" << std::endl;
-    Particle particles = Particle(center_pos, planet_radius, particle_num, velocity, mass, particle_radius);
+    Particle particles(center_pos, planet_radius, particle_num, velocity, mass, particle_radius);
     std::cout << "Hi3" << std::endl;
 
     // Initialize window
