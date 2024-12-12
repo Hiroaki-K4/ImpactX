@@ -25,8 +25,8 @@ class Particle {
         ParticleCuda particle_cuda;
 
     public:
-        Particle(glm::vec3 center_pos, float planet_radius, int particle_num, glm::vec3 velocity,
-            float mass, float particle_radius);
+        Particle(glm::vec3 center_pos_1, glm::vec3 center_pos_2, float planet_radius, int particle_num_1,
+            int particle_num_2, glm::vec3 initial_velocity_1, glm::vec3 initial_velocity_2, float mass, float particle_radius);
         ~Particle();
 
         std::vector<glm::vec3> get_particle_position();

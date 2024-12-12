@@ -1,16 +1,22 @@
 #include "Particle.hpp"
 
 
-Particle::Particle(glm::vec3 center_pos, float planet_radius, int particle_num,
-    glm::vec3 velocity, float mass, float particle_radius) {
+Particle::Particle(glm::vec3 center_pos_1, glm::vec3 center_pos_2, float planet_radius,
+                    int particle_num_1, int particle_num_2, glm::vec3 initial_velocity_1,
+                    glm::vec3 initial_velocity_2, float mass, float particle_radius) {
     this->mass = mass;
     this->collision_distance = particle_radius * 2;
     // reset_min_max_position();
-    initialize_position(center_pos, planet_radius, particle_num);
-    for (int i = 0; i < particle_num; i++) {
-        this->velocity.push_back(velocity);
+    initialize_position(center_pos_1, planet_radius, particle_num_1);
+    for (int i = 0; i < particle_num_1; i++) {
+        this->velocity.push_back(initial_velocity_1);
     }
-    this->particle_cuda.initialize(this->position, this->velocity, particle_num, 256, this->collision_distance);
+    initialize_position(center_pos_2, planet_radius, particle_num_2);
+    for (int i = 0; i < particle_num_2; i++) {
+        this->velocity.push_back(initial_velocity_2);
+    }
+    this->particle_cuda.initialize(this->position, this->velocity, particle_num_1 + particle_num_2,
+                                    256, this->collision_distance);
 }
 
 Particle::~Particle() {

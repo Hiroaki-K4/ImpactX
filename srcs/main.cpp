@@ -273,12 +273,18 @@ int main(int argc, char *argv[]) {
 
     float particle_radius = 0.05f;
     std::vector<float> particle_vertices = generateParticleVertices(particle_radius);
-    glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
+    // TODO: Fix start position
+    glm::vec3 center_pos_1(0.0f);
+    glm::vec3 center_pos_2(100.0f);
     float planet_radius = 2.0f;
-    int particle_num = 10000;
-    glm::vec3 velocity = glm::vec3(0.5f);
+    int particle_num_1 = 5000;
+    int particle_num_2 = 5000;
+    int particle_num = particle_num_1 + particle_num_2;
+    glm::vec3 initial_velocity_1 = glm::vec3(0.5f);
+    glm::vec3 initial_velocity_2 = glm::vec3(-0.5f);
     float mass = 0.01f;
-    Particle particles(center_pos, planet_radius, particle_num, velocity, mass, particle_radius);
+    Particle particles(center_pos_1, center_pos_2, planet_radius, particle_num_1,
+        particle_num_2, initial_velocity_1, initial_velocity_2, mass, particle_radius);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
