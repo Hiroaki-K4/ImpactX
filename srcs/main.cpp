@@ -271,19 +271,14 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
-    std::cout << "Hi fir" << std::endl;
-
-    float particle_radius = 0.03f;
+    float particle_radius = 0.05f;
     std::vector<float> particle_vertices = generateParticleVertices(particle_radius);
     glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
     float planet_radius = 2.0f;
-    std::cout << "Hi1" << std::endl;
-    int particle_num = 2000;
+    int particle_num = 10000;
     glm::vec3 velocity = glm::vec3(0.5f);
     float mass = 0.01f;
-    std::cout << "Hi" << std::endl;
     Particle particles(center_pos, planet_radius, particle_num, velocity, mass, particle_radius);
-    std::cout << "Hi3" << std::endl;
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
@@ -292,7 +287,6 @@ int main(int argc, char *argv[]) {
     unsigned int particleVAO, particleVBO;
     glGenVertexArrays(1, &particleVAO);
     glGenBuffers(1, &particleVBO);
-    std::cout << "Hi semi" << std::endl;
 
     // Store instance data in an array buffer
     unsigned int instanceVBO;
@@ -346,7 +340,6 @@ int main(int argc, char *argv[]) {
     int frame_num = 0;
     space_box_shader.use();
     space_box_shader.setInt("spacebox", 0);
-    std::cout << "Hi final" << std::endl;
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);

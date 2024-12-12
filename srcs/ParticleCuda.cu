@@ -3,7 +3,12 @@
 
 ParticleCuda::ParticleCuda() {}
 
-ParticleCuda::ParticleCuda(std::vector<glm::vec3> &position, std::vector<glm::vec3> &velocity,
+ParticleCuda::~ParticleCuda() {
+    cudaFree(this->cu_position);
+    cudaFree(this->cu_velocity);
+}
+
+void ParticleCuda::initialize(std::vector<glm::vec3> &position, std::vector<glm::vec3> &velocity,
     int particle_num, int threads, float collision_distance) {
     this->threads = threads;
     this->blocks = (particle_num + threads - 1) / threads;
@@ -19,17 +24,11 @@ ParticleCuda::ParticleCuda(std::vector<glm::vec3> &position, std::vector<glm::ve
                cudaMemcpyHostToDevice);
 }
 
-ParticleCuda::~ParticleCuda() {
-    cudaFree(this->cu_position);
-    cudaFree(this->cu_velocity);
-}
-
 void ParticleCuda::update_position_velocity(std::vector<glm::vec3> &position, float mass, float delta_time) {
     update_particle_kernel<<<this->blocks, this->threads>>>(
         this->cu_position, this->cu_velocity, mass, delta_time,
         position.size(), this->collision_distance);
 
-    // TODO: Fix cuda error
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
         std::cerr << "CUDA error: " << cudaGetErrorString(err) << std::endl;

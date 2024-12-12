@@ -21,10 +21,10 @@ class ParticleCuda {
 
     public:
         ParticleCuda();
-        ParticleCuda(std::vector<glm::vec3> &position, std::vector<glm::vec3> &velocity,
-                    int particle_num, int threads, float collision_distance);
         ~ParticleCuda();
 
+        void initialize(std::vector<glm::vec3> &position, std::vector<glm::vec3> &velocity,
+                    int particle_num, int threads, float collision_distance);
         void update_position_velocity(std::vector<glm::vec3> &position, float mass, float delta_time);
 };
 
