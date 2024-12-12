@@ -57,30 +57,6 @@ void Particle::initialize_position(
     }
 }
 
-// void Particle::update_particle(float delta_time) {
-//     for (int i = 0; i < this->position.size(); i++) {
-//         for (int j = 0; j < this->position.size(); j++) {
-//             if (i == j) {
-//                 continue;
-//             }
-//             float dist = glm::distance(this->position[i], this->position[j]);
-//             if (dist <= this->collision_distance) {
-//                 // Calculate collision
-//                 glm::vec3 new_velocity_vec = this->position[i] - this->position[j];
-//                 this->velocity[i] = (this->mass - this->mass) / (this->mass + this->mass) * this->velocity[i] +
-//                                     2 * this->mass / (this->mass + this->mass) * this->velocity[j];
-//             } else {
-//                 // Calculate gravity
-//                 float accel_power = this->mass * this->mass / std::pow(dist, 2);
-//                 glm::vec3 accel = (this->position[j] - this->position[i]) / dist;
-//                 accel *= accel_power;
-//                 this->velocity[i] += accel * delta_time;
-//             }
-//         }
-//         this->position[i] += this->velocity[i] * delta_time;
-//     }
-// }
-
 void Particle::update_particle(float delta_time) {
     this->particle_cuda.update_position_velocity(this->position, this->mass, delta_time);
 }
