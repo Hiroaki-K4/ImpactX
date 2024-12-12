@@ -8,8 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.hpp"
 #include "Particle.hpp"
+#include "Shader.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -271,14 +271,14 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
-    float particle_radius = 0.03f;
+    float particle_radius = 0.05f;
     std::vector<float> particle_vertices = generateParticleVertices(particle_radius);
     glm::vec3 center_pos(0.0f, 0.0f, 0.0f);
     float planet_radius = 2.0f;
-    int particle_num = 2000;
+    int particle_num = 10000;
     glm::vec3 velocity = glm::vec3(0.5f);
     float mass = 0.01f;
-    Particle particles = Particle(center_pos, planet_radius, particle_num, velocity, mass, particle_radius);
+    Particle particles(center_pos, planet_radius, particle_num, velocity, mass, particle_radius);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
 
         double current_time = glfwGetTime();
         double delta = current_time - last_time;
-        particles.update_position(delta);
+        particles.update_particle(delta);
         last_time = glfwGetTime();
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
