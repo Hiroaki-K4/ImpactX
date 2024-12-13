@@ -21,7 +21,9 @@ __global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_vel
                                 2 * mass / (mass + mass) * cu_velocity[j];
         } else {
             // Calculate gravity
-            float accel_power = mass * mass / std::pow(dist, 2) * 0.001;
+            // TODO: Make impact more real
+            float G = 6.6743 * std::pow(10, -30);
+            float accel_power = mass * mass / std::pow(dist, 2) * G;
             glm::vec3 accel = (cu_position[j] - cu_position[i]) / dist;
             accel *= accel_power;
             cu_velocity[i] += accel * delta_time;

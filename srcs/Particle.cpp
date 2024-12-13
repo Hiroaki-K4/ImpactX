@@ -3,20 +3,22 @@
 
 Particle::Particle(glm::vec3 center_pos_1, glm::vec3 center_pos_2, float planet_radius,
                     int particle_num_1, int particle_num_2, glm::vec3 initial_velocity_1,
-                    glm::vec3 initial_velocity_2, float mass, float particle_radius) {
+                    glm::vec3 initial_velocity_2, float mass, float particle_radius, int threads) {
     this->mass = mass;
     this->collision_distance = particle_radius * 2;
+    this->particle_color.initialize(glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.6f, 0.3f, 0.1f));
     // reset_min_max_position();
-    initialize_position(center_pos_1, planet_radius, particle_num_1);
+    initialize(center_pos_1, planet_radius, particle_num_1);
     for (int i = 0; i < particle_num_1; i++) {
         this->velocity.push_back(initial_velocity_1);
     }
-    initialize_position(center_pos_2, planet_radius, particle_num_2);
+    initialize(center_pos_2, planet_radius, particle_num_2);
     for (int i = 0; i < particle_num_2; i++) {
         this->velocity.push_back(initial_velocity_2);
     }
     this->particle_cuda.initialize(this->position, this->velocity, particle_num_1 + particle_num_2,
-                                    256, this->collision_distance);
+                                    threads, this->collision_distance);
 }
 
 Particle::~Particle() {
@@ -26,7 +28,11 @@ std::vector<glm::vec3> Particle::get_particle_position() {
     return this->position;
 }
 
-void Particle::initialize_position(
+std::vector<glm::vec3> Particle::get_particle_color() {
+    return this->color;
+}
+
+void Particle::initialize(
     glm::vec3 center_pos, float planet_radius, int particle_num) {
     std::random_device rd;   // Seed for the random number engine
     std::mt19937 gen(rd());  // Mersenne Twister engine
@@ -44,6 +50,10 @@ void Particle::initialize_position(
         pos.y = center_pos.y + radius * sin(angle_phi);
         pos.z = center_pos.z + radius * cos(angle_phi) * sin(angle_theta);
         this->position.push_back(pos);
+
+        glm::vec3 gradient_color;
+        this->particle_color.calculate_gradient_color(center_pos, pos, planet_radius, gradient_color);
+        this->color.push_back(gradient_color);
     }
 }
 
