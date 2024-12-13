@@ -271,17 +271,16 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
-    float particle_radius = 0.05f;
+    float particle_radius = 0.1f;
     std::vector<float> particle_vertices = generateParticleVertices(particle_radius);
-    // TODO: Fix start position
     glm::vec3 center_pos_1(0.0f);
-    glm::vec3 center_pos_2(100.0f);
+    glm::vec3 center_pos_2(5.0f, 5.0f, 4.5f);
     float planet_radius = 2.0f;
-    int particle_num_1 = 5000;
-    int particle_num_2 = 5000;
+    int particle_num_1 = 10000;
+    int particle_num_2 = 10000;
     int particle_num = particle_num_1 + particle_num_2;
-    glm::vec3 initial_velocity_1 = glm::vec3(0.5f);
-    glm::vec3 initial_velocity_2 = glm::vec3(-0.5f);
+    glm::vec3 initial_velocity_1 = glm::vec3(1.0f);
+    glm::vec3 initial_velocity_2 = glm::vec3(-1.0f);
     float mass = 0.01f;
     Particle particles(center_pos_1, center_pos_2, planet_radius, particle_num_1,
         particle_num_2, initial_velocity_1, initial_velocity_2, mass, particle_radius);

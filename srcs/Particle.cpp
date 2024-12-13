@@ -31,35 +31,19 @@ void Particle::initialize_position(
     std::random_device rd;   // Seed for the random number engine
     std::mt19937 gen(rd());  // Mersenne Twister engine
 
-    // Define a distribution between -1 and 1
     std::uniform_real_distribution<float> angle_phi_dis(-M_PI / 2.0f, M_PI / 2.0f);
     std::uniform_real_distribution<float> angle_theta_dis(0.0f, 2.0f * M_PI);
     std::uniform_real_distribution<float> radius_dis(0.0f, planet_radius);
-    int i = 0;
-    while (i < particle_num) {
+    for (int i = 0; i < particle_num; i++) {
         glm::vec3 pos;
         float angle_phi = angle_phi_dis(gen);
         float angle_theta = angle_theta_dis(gen);
         float radius = radius_dis(gen);
 
-        pos.x = radius * cos(angle_phi) * cos(angle_theta);
-        pos.y = radius * sin(angle_phi);
-        pos.z = radius * cos(angle_phi) * sin(angle_theta);
-
-        bool is_distance_valid = true;
-        for (int j = 0; j < this->position.size(); j++) {
-            float dist = glm::distance(pos, this->position[j]);
-            if (dist <= this->collision_distance) {
-                is_distance_valid = false;
-                break;
-            }
-        }
-
-        if (is_distance_valid) {
-            this->position.push_back(pos);
-            // update_min_max_position(pos);
-            i++;
-        }
+        pos.x = center_pos.x + radius * cos(angle_phi) * cos(angle_theta);
+        pos.y = center_pos.y + radius * sin(angle_phi);
+        pos.z = center_pos.z + radius * cos(angle_phi) * sin(angle_theta);
+        this->position.push_back(pos);
     }
 }
 
