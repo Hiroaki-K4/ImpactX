@@ -16,6 +16,7 @@ __global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_vel
         float dist = glm::distance(cu_position[i], cu_position[j]);
         if (dist <= collision_distance) {
             // Calculate collision
+            // TODO: Fix collision calculation
             if (i < j) {
                 glm::vec3 temp = cu_velocity[i];
                 cu_velocity[i] = cu_velocity[j];
@@ -23,10 +24,9 @@ __global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_vel
             }
         } else {
             // Calculate gravity
-            float G = 6.67430e-5;
+            float G = 6.67430e-11;
             float accel_power = G * (mass * mass) / (dist * dist);
             glm::vec3 accel = (cu_position[j] - cu_position[i]) / dist * accel_power;
-            accel *= accel_power;
             all_accel += accel;
         }
     }

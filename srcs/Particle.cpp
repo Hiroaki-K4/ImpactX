@@ -7,12 +7,14 @@ Particle::Particle(glm::vec3 center_pos_1, glm::vec3 center_pos_2, float planet_
     this->mass = mass;
     this->collision_distance = particle_radius * 2;
     this->particle_color.initialize(glm::vec3(1.0f, 1.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.6f, 0.3f, 0.1f));
+        glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.78, 0.53, 0.31));
     // reset_min_max_position();
     initialize(center_pos_1, planet_radius, particle_num_1);
     for (int i = 0; i < particle_num_1; i++) {
         this->velocity.push_back(initial_velocity_1);
     }
+    this->particle_color.initialize(glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.79, 0.29, 0.21));
     initialize(center_pos_2, planet_radius, particle_num_2);
     for (int i = 0; i < particle_num_2; i++) {
         this->velocity.push_back(initial_velocity_2);
