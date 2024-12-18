@@ -16,14 +16,9 @@ __global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_vel
         float dist = glm::distance(cu_position[i], cu_position[j]);
         if (dist <= collision_distance) {
             // Calculate collision
-            if (i < j) {
-                cu_velocity[i] = cu_velocity[i] - (glm::dot(
-                    cu_velocity[i] - cu_velocity[j], cu_position[i] - cu_position[j]) / (dist * dist))
-                    * (cu_position[i] - cu_position[j]);
-                cu_velocity[j] = cu_velocity[j] - (glm::dot(
-                    cu_velocity[j] - cu_velocity[i], cu_position[j] - cu_position[i]) / (dist * dist))
-                    * (cu_position[j] - cu_position[i]);
-            }
+            cu_velocity[i] = cu_velocity[i] - (glm::dot(
+                cu_velocity[i] - cu_velocity[j], cu_position[i] - cu_position[j]) / (dist * dist))
+                * (cu_position[i] - cu_position[j]);
         } else {
             // Calculate gravity
             float G = 6.67430e-11;

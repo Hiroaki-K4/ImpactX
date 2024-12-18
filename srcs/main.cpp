@@ -15,7 +15,7 @@
 #include "stb_image.h"
 
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 12.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 10.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -274,13 +274,13 @@ int main(int argc, char *argv[]) {
     float particle_radius = 0.02f;
     std::vector<float> particle_vertices = generateParticleVertices(particle_radius);
     glm::vec3 center_pos_1(0.0f);
-    glm::vec3 center_pos_2(3.0f, 3.0f, 4.0f);
-    float planet_radius = 1.0f;
+    glm::vec3 center_pos_2(3.0f, 3.0f, 3.7f);
+    float planet_radius = 0.7f;
     int particle_num_1 = 50000;
     int particle_num_2 = 50000;
     int particle_num = particle_num_1 + particle_num_2;
-    glm::vec3 initial_velocity_1 = glm::vec3(0.1f);
-    glm::vec3 initial_velocity_2 = glm::vec3(-0.5f);
+    glm::vec3 initial_velocity_1 = glm::vec3(0.25f);
+    glm::vec3 initial_velocity_2 = glm::vec3(-0.25f);
     float mass = 1.0f;
     int threads = 256;
     Particle particles(center_pos_1, center_pos_2, planet_radius, particle_num_1,
