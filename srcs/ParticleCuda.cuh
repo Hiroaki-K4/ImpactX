@@ -23,9 +23,9 @@ class ParticleCuda {
         ParticleCuda();
         ~ParticleCuda();
 
-        void initialize(std::vector<glm::vec3> &position, std::vector<glm::vec3> &velocity,
-                    int particle_num, int threads, float collision_distance);
-        void update_position_velocity(std::vector<glm::vec3> &position, float mass, float delta_time);
+        void initialize(const std::vector<glm::vec3> &position, const std::vector<glm::vec3> &velocity,
+                    const int particle_num, const int threads, const float collision_distance);
+        void update_position_velocity(std::vector<glm::vec3> &position, const float mass, const float delta_time);
 };
 
 #endif

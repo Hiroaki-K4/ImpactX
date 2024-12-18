@@ -1,8 +1,8 @@
 #include "kernel.cuh"
 
 
-__global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_velocity, float mass,
-                                float delta_time, int num_particles, float collision_distance) {
+__global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_velocity, const float mass,
+    const float delta_time, const int num_particles, const float collision_distance) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= num_particles) {
         return;
