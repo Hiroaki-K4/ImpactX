@@ -1,20 +1,19 @@
 #include "Particle.hpp"
 
 
-Particle::Particle(glm::vec3 center_pos_1, glm::vec3 center_pos_2, float planet_radius,
-                    int particle_num_1, int particle_num_2, glm::vec3 initial_velocity_1,
-                    glm::vec3 initial_velocity_2, float mass, float particle_radius, int threads) {
+Particle::Particle(const glm::vec3 &center_pos_1, const glm::vec3 &center_pos_2, const float planet_radius,
+                    const int particle_num_1, const int particle_num_2, const glm::vec3 &initial_velocity_1,
+                    const glm::vec3 &initial_velocity_2, const float mass, const float particle_radius, const int threads) {
     this->mass = mass;
     this->collision_distance = particle_radius * 2;
     this->particle_color.initialize(glm::vec3(1.0f, 1.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.78, 0.53, 0.31));
-    // reset_min_max_position();
+        glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.79f, 0.29f, 0.21f));
     initialize(center_pos_1, planet_radius, particle_num_1);
     for (int i = 0; i < particle_num_1; i++) {
         this->velocity.push_back(initial_velocity_1);
     }
-    this->particle_color.initialize(glm::vec3(1.0f, 1.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.79, 0.29, 0.21));
+    this->particle_color.initialize(glm::vec3(0.1f, 0.1f, 0.1f),
+        glm::vec3(0.3f, 0.6f, 0.8f), glm::vec3(0.12f, 0.38f, 0.93f));
     initialize(center_pos_2, planet_radius, particle_num_2);
     for (int i = 0; i < particle_num_2; i++) {
         this->velocity.push_back(initial_velocity_2);
@@ -35,7 +34,7 @@ std::vector<glm::vec3> Particle::get_particle_color() {
 }
 
 void Particle::initialize(
-    glm::vec3 center_pos, float planet_radius, int particle_num) {
+    const glm::vec3 &center_pos, const float planet_radius, const int particle_num) {
     std::random_device rd;   // Seed for the random number engine
     std::mt19937 gen(rd());  // Mersenne Twister engine
 
@@ -62,21 +61,3 @@ void Particle::initialize(
 void Particle::update_particle(float delta_time) {
     this->particle_cuda.update_position_velocity(this->position, this->mass, delta_time);
 }
-
-// void Particle::update_min_max_position(glm::vec3 pos) {
-//     this->max_3d_coord.x = std::max(pos.x, this->max_3d_coord.x);
-//     this->max_3d_coord.y = std::max(pos.y, this->max_3d_coord.y);
-//     this->max_3d_coord.z = std::max(pos.z, this->max_3d_coord.z);
-//     this->min_3d_coord.x = std::min(pos.x, this->min_3d_coord.x);
-//     this->min_3d_coord.y = std::min(pos.y, this->min_3d_coord.y);
-//     this->min_3d_coord.z = std::min(pos.z, this->min_3d_coord.z);
-// }
-
-// void Particle::reset_min_max_position() {
-//     this->max_3d_coord = glm::vec3(std::numeric_limits<float>::min(),
-//                                     std::numeric_limits<float>::min(),
-//                                     std::numeric_limits<float>::min());
-//     this->min_3d_coord = glm::vec3(std::numeric_limits<float>::max(),
-//                                     std::numeric_limits<float>::max(),
-//                                     std::numeric_limits<float>::max());
-// }
