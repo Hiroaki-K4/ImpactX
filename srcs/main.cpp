@@ -15,7 +15,7 @@
 #include "stb_image.h"
 
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 30.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 3.0f, 12.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -271,19 +271,20 @@ int main(int argc, char *argv[]) {
         1.0f, -1.0f,  1.0f
     };
 
-    float particle_radius = 0.1f;
+    float particle_radius = 0.02f;
     std::vector<float> particle_vertices = generateParticleVertices(particle_radius);
     glm::vec3 center_pos_1(0.0f);
-    glm::vec3 center_pos_2(5.0f, 5.0f, 4.5f);
-    float planet_radius = 2.0f;
-    int particle_num_1 = 10000;
-    int particle_num_2 = 10000;
+    glm::vec3 center_pos_2(3.0f, 3.0f, 4.0f);
+    float planet_radius = 1.0f;
+    int particle_num_1 = 50000;
+    int particle_num_2 = 50000;
     int particle_num = particle_num_1 + particle_num_2;
-    glm::vec3 initial_velocity_1 = glm::vec3(1.0f);
-    glm::vec3 initial_velocity_2 = glm::vec3(-1.0f);
-    float mass = 0.01f;
+    glm::vec3 initial_velocity_1 = glm::vec3(0.1f);
+    glm::vec3 initial_velocity_2 = glm::vec3(-0.5f);
+    float mass = 1.0f;
+    int threads = 256;
     Particle particles(center_pos_1, center_pos_2, planet_radius, particle_num_1,
-        particle_num_2, initial_velocity_1, initial_velocity_2, mass, particle_radius);
+        particle_num_2, initial_velocity_1, initial_velocity_2, mass, particle_radius, threads);
 
     // Initialize window
     glViewport(0, 0, window_w, window_h);
@@ -300,6 +301,12 @@ int main(int argc, char *argv[]) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    unsigned int instance_color_VBO;
+    glGenBuffers(1, &instance_color_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_color_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_color().data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glBindVertexArray(particleVAO);
     glBindBuffer(GL_ARRAY_BUFFER, particleVBO);
     glBufferData(GL_ARRAY_BUFFER, particle_vertices.size() * sizeof(float), particle_vertices.data(), GL_STATIC_DRAW);
@@ -312,6 +319,13 @@ int main(int argc, char *argv[]) {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribDivisor(1, 1); // Tell OpenGL this is per-instance data
+
+    // set instance data(color)
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_color_VBO);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(2, 1); // tell OpenGL this is an instanced vertex attribute
     glBindVertexArray(0);
 
     // Space box VAO
@@ -357,6 +371,9 @@ int main(int argc, char *argv[]) {
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_position().data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, instance_color_VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * particle_num, particles.get_particle_color().data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // particle

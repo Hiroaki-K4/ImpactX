@@ -3,12 +3,12 @@
 
 __global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_velocity, float mass,
                                 float delta_time, int num_particles, float collision_distance) {
-    // Get current index
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= num_particles) {
         return;
     }
 
+    glm::vec3 all_accel(0.0f);
     for (int j = 0; j < num_particles; j++) {
         if (i == j) {
             continue;
@@ -16,16 +16,22 @@ __global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_vel
         float dist = glm::distance(cu_position[i], cu_position[j]);
         if (dist <= collision_distance) {
             // Calculate collision
-            glm::vec3 new_velocity_vec = cu_position[i] - cu_position[j];
-            cu_velocity[i] = (mass - mass) / (mass + mass) * cu_velocity[i] +
-                                2 * mass / (mass + mass) * cu_velocity[j];
+            if (i < j) {
+                cu_velocity[i] = cu_velocity[i] - (glm::dot(
+                    cu_velocity[i] - cu_velocity[j], cu_position[i] - cu_position[j]) / (dist * dist))
+                    * (cu_position[i] - cu_position[j]);
+                cu_velocity[j] = cu_velocity[j] - (glm::dot(
+                    cu_velocity[j] - cu_velocity[i], cu_position[j] - cu_position[i]) / (dist * dist))
+                    * (cu_position[j] - cu_position[i]);
+            }
         } else {
             // Calculate gravity
-            float accel_power = mass * mass / std::pow(dist, 2) * 0.001;
-            glm::vec3 accel = (cu_position[j] - cu_position[i]) / dist;
-            accel *= accel_power;
-            cu_velocity[i] += accel * delta_time;
+            float G = 6.67430e-11;
+            float accel_power = G * (mass * mass) / (dist * dist);
+            glm::vec3 accel = (cu_position[j] - cu_position[i]) / dist * accel_power;
+            all_accel += accel;
         }
     }
+    cu_velocity[i] += all_accel * delta_time;
     cu_position[i] += cu_velocity[i] * delta_time;
 }
