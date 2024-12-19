@@ -1,5 +1,6 @@
 # ImpactX
-This repository provides a simple simulation of planetary collisions using OpenGL. For collisions, only gravity and elastic collision are considered. Please make sure that cuda is installed when you run the simulation, because it uses cuda for speed-up.
+This repository provides a simple simulation of planetary impact using OpenGL. For collisions, only gravity and elastic collision are considered. Please make sure that cuda is installed when you run the simulation, because it uses cuda for speed-up.
+Please check the [video](https://www.youtube.com/watch?v=qOS5XkfjJGc) of this simulation on YouTube.
 
 <img src="resources/planetary_impact.gif" width='600'>
 
@@ -91,7 +92,7 @@ __global__ void update_particle_kernel(glm::vec3 *cu_position, glm::vec3 *cu_vel
 }
 ```
 
-However, this process's time complexity is $O(n^2)$, so it is difficult to simulate with a million particles, etc. Although not implemented this time, it is necessary to speed up the simulation by using [Barnes-Hut Algorithm](http://arborjs.org/docs/barnes-hut), etc
+However, this process takes a lot of time to calculate all pairs, so it is difficult to simulate with a million particles, etc. Although not implemented this time, it is necessary to speed up the simulation by using [Barnes-Hut Algorithm](http://arborjs.org/docs/barnes-hut), etc.
 
 <br></br>
 
