@@ -97,7 +97,7 @@ However, this process takes a lot of time to calculate all pairs, so it is diffi
 <br></br>
 
 # How to run
-The tested environment is as follows. With NVIDIA GeForce RTX 4060, it was about 4 fps for 10k particles.
+The tested environment is as follows. With NVIDIA GeForce RTX 4060, it was about 4 fps for 100k particles.
 
 ```
 - OS -> Ubuntu
