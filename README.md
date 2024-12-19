@@ -15,7 +15,7 @@ $$
 m_A v_{A1} + m_B v_{B1} = m_A v_{A2} + m_B v_{B2} \qquad(1)
 $$
 
-Likewise, the conservation of the total kenetic energey is expressed by:
+Likewise, the conservation of the total kinetic energey is expressed by:
 
 $$
 \frac{1}{2} m_A v_{A1}^2 + \frac{1}{2} m_B v_{B1}^2 = \frac{1}{2} m_A v_{A2}^2 + \frac{1}{2} m_A v_{B2}^2 \qquad(2)
@@ -43,7 +43,7 @@ $$
 
 where the angle brackets indicate the inner product of two vectors.
 
-For collisions of two or more dimentions, the angle of collision must also be considered: if the vector between the centers of the particles is taken as the axis of collision and the projection vector of the velocity vector on that axis, we can use Eq(3) in one dimention.
+For collisions of two or more dimensions, the angle of collision must also be considered: if the vector between the centers of the particles is taken as the axis of collision and the projection vector of the velocity vector on that axis, we can use Eq(3) in one dimention.
 
 <img src="resources/2d_collision.png" width='600'>
 
@@ -52,10 +52,10 @@ Although not an angle free method, [this article](https://williamecraver.wixsite
 <br></br>
 
 # Velocity update
-If the particles are less than or equal to the sum of each other's radius, they are cosidered to be in collision and a post-collision calculation is performed with elastic collision. If not, the gravity with other particles is calculated by the following formula.
+If the particles are less than or equal to the sum of each other's radius, they are considered to be in collision and a post-collision calculation is performed with elastic collision. If not, the gravity with other particles is calculated by the following formula.
 
 $$
-F=G\frac{Mm}{r^2}
+F=G\frac{Mm}{r^2} \qquad(5)
 $$
 
 For acceleration, cuda is used to calculate collisions and gravity.
@@ -105,7 +105,7 @@ The tested environment is as follows. With NVIDIA GeForce RTX 4060, it was about
 - Cuda -> 11.8
 ```
 
-First, you should intall glfw on your environemt by running following command.
+First, you should install glfw on your environemt by running following command.
 
 ```bash
 bash setup.sh
