@@ -1,6 +1,6 @@
 # ImpactX
 This repository provides a simple simulation of planetary impact using OpenGL. For collisions, only gravity and elastic collision are considered. Please make sure that cuda is installed when you run the simulation, because it uses cuda for speed-up.
-Please check the [video](https://www.youtube.com/watch?v=qOS5XkfjJGc) of this simulation on YouTube.
+Please check the [video](https://www.youtube.com/watch?v=4k1FL6W7q1k) of this simulation on YouTube.
 
 <img src="resources/planetary_impact.gif" width='600'>
 
